@@ -43,7 +43,7 @@ A beautiful snake.io-inspired browser game where you control a daisy in an infin
 
 ## 🚀 Play Now
 
-**[Play Flower.io →](https://yourusername.github.io/flower-io/)**
+**[Play Flower.io →](https://rey093.github.io/flower-io/)**
 
 ## 💻 Development
 

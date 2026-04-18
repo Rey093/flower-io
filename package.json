@@ -1,0 +1,19 @@
+{
+  "name": "flower-io",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:api": "pnpm --filter @flower-io/api dev",
+    "dev:web": "pnpm --filter @flower-io/web dev",
+    "dev:admin": "pnpm --filter @flower-io/admin dev",
+    "build": "pnpm -r --filter \"./apps/*\" build",
+    "typecheck": "pnpm -r typecheck",
+    "gen:client": "cd apps/api && encore gen client flower-io --target=../../packages/api-client/src/client.ts --lang=typescript"
+  },
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

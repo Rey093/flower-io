@@ -1,85 +1,82 @@
-# 🌼 Flower.io
+# flower-io
 
-A beautiful snake.io-inspired browser game where you control a daisy in an infinite scrolling arena!
+A toy library app — catalog of books on shelves, borrow/return flow — built as a pnpm monorepo with a typed backend, a public SPA and an admin panel.
 
-## 🎮 Game Features
+## Stack
 
-- **🌸 Beautiful Daisy Character**: Procedurally drawn with white petals and golden center
-- **🌺 Flower Collection**: Eat colorful flowers to grow and increase your score
-- **💩 Boss Battles**: Fight "Maxim" - a cute cartoon poop boss that spawns periodically
-- **🌸 Petal Shooting**: Shoot petal projectiles at bosses with precise aiming
-- **📱 Mobile Support**: Full touch controls with virtual joystick and shoot button
-- **🎨 Visual Effects**: Particle systems, screen shake, floating text, and smooth animations
-- **⚙️ Accessibility**: High contrast mode, reduced motion, and sound toggles
+| Layer       | Tech                                                                 |
+| ----------- | -------------------------------------------------------------------- |
+| Backend     | [Encore.ts](https://encore.dev) (Node)                               |
+| Public site | Vite + React 19 + TanStack Router / Query / Table + Tailwind v4 + shadcn |
+| Admin       | Vite + React 18 + Refine + react-router-v6 + TanStack Table + shadcn |
+| SEO         | Self-hosted Prerender + nginx at the edge                            |
 
-## 🕹️ Controls
+## Structure
 
-### Desktop
-- **Movement**: WASD / Arrow keys or mouse steering
-- **Shoot**: Left mouse button
-- **Pause**: P key
-- **FPS Toggle**: ~ key (tilde)
-
-### Mobile
-- **Movement**: Virtual joystick (bottom left)
-- **Shoot**: Shoot button (bottom right)
-- **Pause**: Pause button (top right)
-
-## 🎯 Gameplay
-
-1. **Collect Flowers**: Move around and eat colorful flowers to grow your daisy
-2. **Avoid the Boss**: When Maxim spawns, keep your distance or fight back
-3. **Shoot Petals**: Use petal projectiles to damage and defeat bosses
-4. **Grow & Score**: Larger daisies move slower but score more points
-5. **Survive**: Don't let your health reach zero!
-
-## 🛠️ Technical Features
-
-- **Pure Vanilla Code**: Single HTML file with no external dependencies
-- **60 FPS Performance**: Optimized game loop with fixed timestep
-- **Responsive Design**: Works perfectly on desktop and mobile
-- **Canvas Rendering**: Smooth graphics with pixel-perfect scaling
-- **Local Storage**: Best scores and settings are saved automatically
-
-## 🚀 Play Now
-
-**[Play Flower.io →](https://rey093.github.io/flower-io/)**
-
-## 💻 Development
-
-The entire game is contained in a single `index.html` file (~62KB). Simply open it in any modern web browser to play!
-
-### File Structure
 ```
-flower-io/
-├── index.html    # Complete game (HTML + CSS + JS)
-└── README.md     # This file
+apps/
+  api/         Encore.ts backend (books + shelves services, in-memory mock data)
+  web/         Public SPA
+  admin/       Internal admin panel
+packages/
+  shared/      Shared domain types (placeholder, to be replaced by generated client)
+  api-client/  Auto-generated Encore TypeScript client (populated by `pnpm gen:client`)
+  ui/          Shared shadcn components (placeholder)
+deploy/
+  prerender/   Self-hosted Prerender Docker image (headless Chrome)
+  nginx/       Edge nginx routing bot UAs → prerender
+  docker-compose.yml
 ```
 
-### Features Implemented
-- ✅ Single-file architecture
-- ✅ Snake.io-style movement mechanics
-- ✅ Boss battle system with AI
-- ✅ Projectile combat system
-- ✅ Progressive difficulty scaling
-- ✅ Mobile touch controls
-- ✅ Settings and accessibility options
-- ✅ Particle effects and visual polish
-- ✅ Sound system (Web Audio API)
-- ✅ Persistent high scores
+## Prerequisites
 
-## 🎨 Game Design
+- Node 20+
+- pnpm 9+ (`corepack enable`)
+- [Encore CLI](https://encore.dev/docs/install) — `curl -L https://encore.dev/install.sh | bash`
+- Docker (only for the prerender/edge stack)
 
-**Visual Style**: Clean, bright, and playful with procedurally drawn flowers and characters
+## Install
 
-**Audio**: Optional retro-style beeps and boops using Web Audio API
+```bash
+pnpm install
+```
 
-**Accessibility**: High contrast mode, reduced motion options, and keyboard navigation
+## Develop
 
-## 📄 License
+```bash
+pnpm dev:api      # Encore → http://localhost:4000
+pnpm dev:web      # Vite SPA → http://localhost:5173 (proxies /api → :4000)
+pnpm dev:admin    # Refine admin → http://localhost:5174
+```
 
-This project is open source and available under the MIT License.
+Regenerate the typed API client after API changes:
 
----
+```bash
+pnpm gen:client
+```
 
-Made with 💚 for the love of browser games!
+Writes to `packages/api-client/src/client.ts`. Consumers can then import end-to-end types from `@flower-io/api-client`.
+
+## API surface
+
+| Method | Path                     | Description                        |
+| ------ | ------------------------ | ---------------------------------- |
+| GET    | `/books`                 | List all books                     |
+| GET    | `/books/:id`             | Get a book                         |
+| POST   | `/books/:id/borrow`      | Borrow a book — body `{user}`      |
+| POST   | `/books/:id/return`      | Return a book                      |
+| GET    | `/shelves`               | List all shelves                   |
+| GET    | `/shelves/:id`           | Get a shelf                        |
+| GET    | `/shelves/:id/books`     | Books on a shelf                   |
+
+## Production edge (prerender + nginx)
+
+See [`deploy/README.md`](./deploy/README.md). tl;dr:
+
+```bash
+pnpm --filter @flower-io/web build
+cd deploy && docker compose up --build
+# → http://localhost:8080
+```
+
+nginx routes bot User-Agents (Googlebot, Bingbot, ClaudeBot, GPTBot, social crawlers, …) through a headless-Chrome Prerender service and serves fully-rendered HTML. Human users get the SPA directly.

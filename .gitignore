@@ -7,6 +7,7 @@ dist/
 build/
 encore.gen/
 .turbo/
+*.tsbuildinfo
 
 # Environment
 .env

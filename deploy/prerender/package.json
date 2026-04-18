@@ -1,0 +1,13 @@
+{
+  "name": "flower-io-prerender",
+  "version": "0.0.0",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "prerender": "^5.30.0",
+    "prerender-memory-cache": "^0.1.0"
+  }
+}

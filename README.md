@@ -1,37 +1,42 @@
 # flower-io
 
-Toy library-backend on [Encore.ts](https://encore.dev/docs/ts) with two services, mock in-memory data, and endpoints to borrow/return books.
+Monorepo for a simple library-style app. Backend on [Encore.ts](https://encore.dev), frontends on Vite + React (planned).
 
-## Services
+## Structure
 
-- **books** — catalog and borrow/return actions
-- **shelves** — shelves and listing books on a shelf
+```
+apps/
+  api/         Encore.ts backend (books + shelves services)
+  web/         Public SPA — Vite + React + TanStack + shadcn (planned)
+  admin/       Admin panel — Refine + shadcn (planned)
 
-## Run
-
-```bash
-npm install
-encore run
+packages/
+  shared/      Shared domain types
+  api-client/  Auto-generated Encore TypeScript client
+  ui/          Shared shadcn components (planned)
 ```
 
-Requires the [Encore CLI](https://encore.dev/docs/install). App is exposed at `http://localhost:4000`.
+## Prerequisites
 
-## API
+- Node 20+
+- pnpm 9+ (`corepack enable` picks up the version from `packageManager` in `package.json`)
+- [Encore CLI](https://encore.dev/docs/install) for `dev:api` and `gen:client`
 
-| Method | Path                    | Description                      |
-| ------ | ----------------------- | -------------------------------- |
-| GET    | `/books`                | List all books                   |
-| GET    | `/books/:id`            | Get a book                       |
-| POST   | `/books/:id/borrow`     | Borrow a book (body: `{user}`)   |
-| POST   | `/books/:id/return`     | Return a book                    |
-| GET    | `/shelves`              | List all shelves                 |
-| GET    | `/shelves/:id`          | Get a shelf                      |
-| GET    | `/shelves/:id/books`    | List books on a shelf            |
-
-## Example
+## Install
 
 ```bash
-curl http://localhost:4000/shelves/s1/books
-curl -X POST http://localhost:4000/books/b1/borrow -d '{"user":"alice"}'
-curl -X POST http://localhost:4000/books/b1/return
+pnpm install
 ```
+
+## Develop
+
+```bash
+pnpm dev:api       # encore run → http://localhost:4000
+pnpm dev:web       # (after web is scaffolded)
+pnpm dev:admin     # (after admin is scaffolded)
+pnpm gen:client    # regenerate packages/api-client from API metadata
+```
+
+## Deployment notes
+
+- Prerender for SEO/bots: self-hosted [Rendertron](https://github.com/GoogleChromeLabs/rendertron) fronted by nginx that routes bot User-Agents to the prerender service.
